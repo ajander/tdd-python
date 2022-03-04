@@ -37,14 +37,19 @@ class NewVisitorTest(unittest.TestCase):
 
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertTrue(
-                any(row.text == '1: first item' for row in rows),
-                "New to-do item did not appear in table"
-                )
+        self.assertIn('1: first item', [row.text for row in rows])
 
         # Still has a text box inviting you to enter a to-do item. Adds a second one.
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('second item')
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
 
         # Page updates and shows both items
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn('1: first item', [row.text for row in rows])
+        self.assertIn('2: second item', [row.text for row in rows])
 
         # Site generates a url with her items, with explanatory text telling her that
 
