@@ -1,9 +1,9 @@
+from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
-import unittest
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
 
     def setUp(self):
         self.browser = webdriver.Firefox()
@@ -19,7 +19,7 @@ class NewVisitorTest(unittest.TestCase):
     def test_can_start_a_list_and_retrieve_it_later(self):
 
         # Heard about a web app, go check out the url
-        self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
 
         # Notices page title says something about to-do lists
         self.assertIn('To-Do', self.browser.title)
@@ -51,11 +51,11 @@ class NewVisitorTest(unittest.TestCase):
         self.check_for_row_in_list_table('1: first item')
         self.check_for_row_in_list_table('2: second item')
 
+        self.fail('Finish writing the test!')
+
         # Site generates a url with her items, with explanatory text telling her that
 
         # Visits the url, the to-do items are there
 
         # Done
 
-if __name__ == '__main__':
-    unittest.main()
