@@ -27,7 +27,7 @@ class NewVisitorTest(LiveServerTestCase):
                     raise e
                 time.sleep(0.5)
 
-    def test_can_start_a_list_and_retrieve_it_later(self):
+    def test_can_start_a_list_for_one_user(self):
 
         # Heard about a web app, go check out the url
         self.browser.get(self.live_server_url)
@@ -60,11 +60,43 @@ class NewVisitorTest(LiveServerTestCase):
         self.wait_for_row_in_list_table('1: first item')
         self.wait_for_row_in_list_table('2: second item')
 
-        self.fail('Finish writing the test!')
+    def test_multiple_users_can_start_lists_at_different_urls(self):
 
-        # Site generates a url with her items, with explanatory text telling her that
+        # first user comes to site
 
-        # Visits the url, the to-do items are there
+        self.browser.get(self.live_server_url)
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('user1 thing 1')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: user1 thing 1')
 
-        # Done
+        user1_list_url = self.browser.current_url
+        self.assertRegex(user1_list_url, '/lists/.+')
+
+        # second user comes to site, make sure does not show user 1 data
+
+        self.browser.quit()
+        self.browser = webdriver.Firefox()
+
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('user1 thing 1', page_text)
+
+        # user 2 starts a new list
+
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('user2 thing 1')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: user2 thing 1')
+
+        # user 2 gets their own url
+
+        user2_list_url = self.browser.current_url
+        self.assertRegex(user2_list_url, '/lists/.+')
+        self.assertNotEqual(user1_list_url, user2_list_url)
+
+        # make sure still no user 1 data
+        page_text = self.browser.find_element_by_name('body').text
+        self.assertNotIn('user1 thing 1', page_text)
+        self.assertIn('user2 thing 1', page_text)
 
