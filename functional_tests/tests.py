@@ -96,7 +96,7 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertNotEqual(user1_list_url, user2_list_url)
 
         # make sure still no user 1 data
-        page_text = self.browser.find_element_by_name('body').text
+        page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('user1 thing 1', page_text)
         self.assertIn('user2 thing 1', page_text)
 
